@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# 🍄 MARIO SHIP COMMAND WRAPPER
+# Usage: ./ship "description of what was completed"
+# Or just: ./ship (uses default message)
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+COMPLETED_WORK="${1:-"Incremental improvements and feature enhancements"}"
+
+echo "🍄 Mario Jump Button Ship Command"
+echo "=================================="
+echo "📦 What was completed: $COMPLETED_WORK"
+echo ""
+
+# Make sure mario-ship.js is executable
+chmod +x "$SCRIPT_DIR/mario-ship.js"
+
+# Run the Mario shipping orchestrator
+node "$SCRIPT_DIR/mario-ship.js" "$COMPLETED_WORK"
