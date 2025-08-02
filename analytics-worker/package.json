@@ -1,0 +1,24 @@
+{
+  "name": "shipping-analytics-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "db:create": "wrangler d1 create shipping-analytics-db",
+    "db:init": "wrangler d1 execute shipping-analytics-db --file=./schema.sql",
+    "db:studio": "wrangler d1 studio shipping-analytics-db"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "@hono/zod-validator": "^0.2.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "wrangler": "^3.24.0",
+    "typescript": "^5.3.3"
+  }
+}

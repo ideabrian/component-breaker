@@ -16,6 +16,7 @@
 import { execSync } from 'child_process';
 import { writeFileSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { AnalyticsEnhancedMarioShipper } from './analytics-service.js';
 
 const MARIO_VERSION = "3.0.0";
 const PROJECT_ROOT = process.cwd();
@@ -372,7 +373,13 @@ ${analysis.technicalDebt.slice(0, 3).map(debt => `- ${debt}`).join('\n')}
 // 🎮 COMMAND LINE INTERFACE
 if (import.meta.url === `file://${process.argv[1]}`) {
     const completedWork = process.argv[2] || "Incremental improvements and bug fixes";
-    const mario = new MarioShippingOrchestrator(completedWork);
+    
+    // Use analytics-enhanced shipper for comprehensive tracking
+    const mario = new AnalyticsEnhancedMarioShipper(completedWork, {
+        apiBaseUrl: 'https://shipping-analytics-api.workers.dev',
+        marioVersion: MARIO_VERSION
+    });
+    
     mario.ship();
 }
 

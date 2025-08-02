@@ -1,0 +1,38 @@
+name = "shipping-analytics-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# AI Bindings for intelligent analysis
+[ai]
+binding = "AI"
+
+# D1 Database for structured analytics data
+[[d1_databases]]
+binding = "DB"
+database_name = "shipping-analytics-db"
+database_id = "ee75f031-5e8f-48fd-8fce-d3c3571ccfc3"
+
+# KV Storage for real-time event streaming
+[[kv_namespaces]]
+binding = "ANALYTICS_KV"
+id = "dc7c847975294c5c93b70e0393c08079"
+
+# Durable Objects for WebSocket connections
+[[durable_objects.bindings]]
+name = "ANALYTICS_WEBSOCKET"
+class_name = "AnalyticsWebSocketDurableObject"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["AnalyticsWebSocketDurableObject"]
+
+# CORS configuration
+[vars]
+ENVIRONMENT = "production"
+ALLOWED_ORIGINS = "https://component-breaker.pages.dev,http://localhost:5173"
+
+[env.dev]
+[env.dev.vars]
+ENVIRONMENT = "development"
+ALLOWED_ORIGINS = "http://localhost:5173,http://localhost:3000"
