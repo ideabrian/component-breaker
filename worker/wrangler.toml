@@ -1,0 +1,23 @@
+name = "component-breaker-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[ai]
+binding = "AI"
+
+[[routes]]
+pattern = "*/api/*"
+zone_name = "component-breaker.pages.dev"
+
+[vars]
+ENVIRONMENT = "production"
+
+[env.dev]
+[env.dev.vars]
+ENVIRONMENT = "development"
+
+# CORS configuration for your frontend domain
+[env.production]
+[env.production.vars]
+ALLOWED_ORIGINS = "https://90a9a87d.component-breaker.pages.dev,https://component-breaker.pages.dev"

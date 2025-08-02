@@ -1,0 +1,9 @@
+{
+  "name": "Mario's Agent Registry",
+  "description": "🍄 ONE working agent that SHIPS TODAY!",
+  "command": "node",
+  "args": ["/Users/maxyolo/Documents/projects/component-breaker/claude-agents-mcp/dist/index.js"],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}

@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { ComponentAnalysis } from '../services/api'
 
 interface ComponentBreakdownProps {
+  analysis: ComponentAnalysis | null
   onReset: () => void
 }
 
-export default function ComponentBreakdown({ onReset }: ComponentBreakdownProps) {
+export default function ComponentBreakdown({ analysis, onReset }: ComponentBreakdownProps) {
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
 
   const handleCopy = async (text: string, itemId: string) => {
@@ -17,10 +19,29 @@ export default function ComponentBreakdown({ onReset }: ComponentBreakdownProps)
     }
   }
 
-  // Hardcoded sample data for MVP
-  const breakdown = {
+  // Fallback data if no analysis provided
+  const breakdown = analysis || {
     elementType: "Primary Button",
     description: "A modern blue button with hover effects and rounded corners",
+    colors: {
+      background: "#3B82F6",
+      text: "#FFFFFF",
+      hover: "#2563EB"
+    },
+    spacing: {
+      padding: "16px 24px",
+      margin: "0"
+    },
+    typography: {
+      fontSize: "16px",
+      fontWeight: "500",
+      fontFamily: "system-ui"
+    },
+    styles: {
+      borderRadius: "8px",
+      border: "none",
+      boxShadow: "none"
+    },
     tailwindClasses: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors",
     htmlCode: `<button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
   Get Started
@@ -53,13 +74,46 @@ export default function ComponentBreakdown({ onReset }: ComponentBreakdownProps)
         </button>
       </div>
 
-      {/* Sample Preview */}
+      {/* Component Preview */}
       <div className="bg-gray-50 rounded-lg p-8 text-center">
         <p className="text-sm text-gray-500 mb-4">Preview:</p>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-          Get Started
-        </button>
+        <div 
+          className={breakdown.tailwindClasses}
+          style={{
+            backgroundColor: breakdown.colors?.background,
+            color: breakdown.colors?.text,
+          }}
+        >
+          {breakdown.elementType.includes('Button') ? 'Button Text' : 'Component'}
+        </div>
       </div>
+
+      {/* Color Palette */}
+      {breakdown.colors && (
+        <div className="bg-white border rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Color Palette</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {Object.entries(breakdown.colors).map(([colorType, colorValue]) => (
+              <div key={colorType} className="flex items-center space-x-3">
+                <div 
+                  className="w-8 h-8 rounded border border-gray-200 flex-shrink-0"
+                  style={{ backgroundColor: colorValue }}
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 capitalize">{colorType}</p>
+                  <p className="text-xs text-gray-500 truncate">{colorValue}</p>
+                </div>
+                <button
+                  onClick={() => handleCopy(colorValue, `color-${colorType}`)}
+                  className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                >
+                  {copiedItem === `color-${colorType}` ? '✓' : 'Copy'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Element Info */}
       <div className="bg-white border rounded-lg p-6">

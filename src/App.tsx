@@ -2,12 +2,15 @@ import { useState } from 'react'
 import FileUpload from './components/FileUpload'
 import CCBuilderDashboard from './components/CCBuilderDashboard'
 import ComponentBreakdown from './components/ComponentBreakdown'
+import { analyzeImage, ComponentAnalysis } from './services/api'
 
 function App() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [currentView, setCurrentView] = useState<'componentbreaker' | 'dashboard'>('componentbreaker')
   const [showBreakdown, setShowBreakdown] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<ComponentAnalysis | null>(null)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
 
   const handleFileSelect = (file: File) => {
     setUploadedFile(file)
@@ -17,26 +20,77 @@ function App() {
 
   const handleTrySample = () => {
     setIsAnalyzing(true)
-    // Simulate analysis time
+    setAnalysisError(null)
+    
+    // For sample demo, we'll use hardcoded data for now
+    // In production, you could have a sample image that gets analyzed
     setTimeout(() => {
+      setAnalysisResult({
+        elementType: "Primary Button",
+        description: "A modern blue button with hover effects and rounded corners",
+        colors: {
+          background: "#3B82F6",
+          text: "#FFFFFF",
+          hover: "#2563EB"
+        },
+        spacing: {
+          padding: "16px 24px",
+          margin: "0"
+        },
+        typography: {
+          fontSize: "16px",
+          fontWeight: "500",
+          fontFamily: "system-ui"
+        },
+        styles: {
+          borderRadius: "8px",
+          border: "none",
+          boxShadow: "none"
+        },
+        tailwindClasses: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors",
+        htmlCode: `<button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+  Get Started
+</button>`,
+        breakdown: [
+          { property: "Background Color", value: "bg-blue-600", description: "Primary blue background" },
+          { property: "Hover State", value: "hover:bg-blue-700", description: "Darker blue on hover" },
+          { property: "Text Color", value: "text-white", description: "White text for contrast" },
+          { property: "Horizontal Padding", value: "px-4", description: "16px left and right padding" },
+          { property: "Vertical Padding", value: "py-2", description: "8px top and bottom padding" },
+          { property: "Border Radius", value: "rounded-lg", description: "8px rounded corners" },
+          { property: "Font Weight", value: "font-medium", description: "Medium font weight (500)" },
+          { property: "Transition", value: "transition-colors", description: "Smooth color transitions" }
+        ]
+      })
       setIsAnalyzing(false)
       setShowBreakdown(true)
     }, 2000)
   }
 
-  const handleAnalyzeUpload = () => {
+  const handleAnalyzeUpload = async () => {
+    if (!uploadedFile) return
+    
     setIsAnalyzing(true)
-    // Simulate analysis time for uploaded file
-    setTimeout(() => {
-      setIsAnalyzing(false)
+    setAnalysisError(null)
+    
+    try {
+      const response = await analyzeImage(uploadedFile)
+      setAnalysisResult(response.analysis)
       setShowBreakdown(true)
-    }, 2000)
+    } catch (error) {
+      console.error('Analysis failed:', error)
+      setAnalysisError(error instanceof Error ? error.message : 'Analysis failed')
+    } finally {
+      setIsAnalyzing(false)
+    }
   }
 
   const handleReset = () => {
     setUploadedFile(null)
     setShowBreakdown(false)
     setIsAnalyzing(false)
+    setAnalysisResult(null)
+    setAnalysisError(null)
   }
 
   if (currentView === 'dashboard') {
@@ -66,7 +120,27 @@ function App() {
         
         <div className="bg-white rounded-lg shadow-lg p-8">
           {showBreakdown ? (
-            <ComponentBreakdown onReset={handleReset} />
+            <ComponentBreakdown analysis={analysisResult} onReset={handleReset} />
+          ) : analysisError ? (
+            <div className="text-center py-12">
+              <div className="text-red-600 text-6xl mb-4">⚠️</div>
+              <p className="text-lg font-medium text-red-900 mb-2">Analysis Failed</p>
+              <p className="text-red-600 mb-4">{analysisError}</p>
+              <div className="space-x-4">
+                <button
+                  onClick={uploadedFile ? handleAnalyzeUpload : handleTrySample}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Start Over
+                </button>
+              </div>
+            </div>
           ) : isAnalyzing ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
